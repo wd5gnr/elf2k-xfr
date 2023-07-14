@@ -17,7 +17,7 @@ The line pacing is handled by waiting for >>> This is the part you might need to
 A ? in the prompt output indicates an error
 
 
-Added a 500uS sleep before each line which makes it work better.
+Added a 10ms sleep before each line which makes it work better.
 
 Build: gcc -o elf2k-xfr elf2k-xfr.c
 
