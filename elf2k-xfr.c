@@ -33,6 +33,7 @@ void elfwait(int errc)
       }
     fputc('>',stderr);
     fputc(getchar(),stderr); fputc(getchar(),stderr);  // eat next two >>
+    usleep(10000);
   }
 
 

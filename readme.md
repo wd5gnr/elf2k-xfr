@@ -17,6 +17,13 @@ The line pacing is handled by waiting for >>> This is the part you might need to
 A ? in the prompt output indicates an error
 
 
+Added a 500uS sleep before each line which makes it work better.
+
+Build: gcc -o elf2k-xfr elf2k-xfr.c
+
+
+
+
 Public domain by Al Williams
 This was repacked as am4up for use with AmForth.
 https://sourceforge.net/p/amforth/code/HEAD/tree/releases/5.1/tools/am4up.c
