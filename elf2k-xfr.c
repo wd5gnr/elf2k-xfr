@@ -20,20 +20,33 @@
 // A ? in the prompt output indicates an error
 
 
+// New version
+// -d usec : delay time after line
+// -c char : response char (default >)
+// -n #    : # of response characters to eat (default 2, plus the first one)
+// -e char : Error character (default ?
+
+
+unsigned int ldelay=10000;
+char rchar='>';
+unsigned int nct=2;
+char echar='?';
 
 // wait for prompt -- errc is an error character
 void elfwait(int errc)
   {
     int c;
     // wait for response
-    while ((c=getchar())!='>')
+    while ((c=getchar())!=rchar)
       {
 	fputc(c,stderr);
 	if (c==errc) { fprintf(stderr,"\nError - %c\n",errc); exit(2); }
       }
     fputc('>',stderr);
-    fputc(getchar(),stderr); fputc(getchar(),stderr);  // eat next two >>
-    usleep(10000);
+    c=0;
+    while (c!=nct)
+      fputc(getchar(),stderr); // eat rest of prompt
+    usleep(ldelay);
   }
 
 
@@ -41,11 +54,33 @@ int main(int argc, char *argv[])
 {
   FILE *f=NULL;
   time_t t0,t1;
-  fprintf(stderr,"elf2k-xfr by Al Williams... Uploading ");
-  if (argc>1) 
+  int opt;
+  while ((opt=getopt(argc,argv,"d:c:n:e:"))!= -1)
     {
-      fprintf(stderr,"%s\n",argv[1]);
-      f=fopen(argv[1],"r");
+      switch (opt)
+	{
+	case 'd':
+	  ldelay=atoi(optarg);
+	  break;
+	case 'c':
+	  rchar=*optarg;
+	  break;
+	case 'n':
+	  nct=atoi(optarg);
+	  break;
+	case 'e':
+	  echar=*optarg;
+	  break;
+	default:
+	  fprintf(stderr,"Bad argument to %s\n",argv[0]);
+	  exit(2);
+	}
+    }
+  fprintf(stderr,"elf2k-xfr by Al Williams... Uploading ");
+  if (optind<argc)
+    {
+      fprintf(stderr,"%s\n",argv[optind]);
+      f=fopen(argv[optind],"r");
     }
   if (!f) { fprintf(stderr, "No file\n"); exit(1); }
   putchar('\r'); putchar('\n');
@@ -64,7 +99,7 @@ int main(int argc, char *argv[])
       if (c1!=c) { fprintf(stderr,"\nError (%c,%c)\n",c1,c); exit(2); }
       if (c=='\r') 
 	{
-	  elfwait('?');
+	  elfwait(echar);
 	}
     }
   time(&t1);

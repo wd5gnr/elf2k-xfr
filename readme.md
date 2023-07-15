@@ -21,6 +21,16 @@ Added a 10ms sleep before each line which makes it work better.
 
 Build: gcc -o elf2k-xfr elf2k-xfr.c
 
+Update: Command line options
+
+* -d delay - Delay before starting new line (default 10000us)
+* -c char - Character to wait for (default >)
+* -n num - Number of characters to eat after the -c character (default 2)
+* -e err - Error character (default ?)
+
+So for elf2k monitor, the defaults are fine. For Basic on the ELF2k use as
+program name: elf2k-xfer -c > -n 0 -e :
+
 
 
 
