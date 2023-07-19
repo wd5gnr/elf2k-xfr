@@ -42,10 +42,13 @@ void elfwait(int errc)
 	fputc(c,stderr);
 	if (c==errc) { fprintf(stderr,"\nError - %c\n",errc); exit(2); }
       }
-    fputc('>',stderr);
+    fputc(rchar,stderr); 
     c=0;
     while (c!=nct)
-      fputc(getchar(),stderr); // eat rest of prompt
+      {
+	fputc(getchar(),stderr); // eat rest of prompt
+	c++;
+      }
     usleep(ldelay);
   }
 
