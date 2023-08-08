@@ -13,7 +13,7 @@ Compile
 To compile this file:
 
 ```
-gcc -o am4up elf2k-xfr.c 
+gcc -o elf2k-xfr elf2k-xfr.c 
 ```
 
 Then copy the executable to your path somewhere 
