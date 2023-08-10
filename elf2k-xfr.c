@@ -40,7 +40,7 @@ void elfwait(int errc)
     while ((c=getchar())!=rchar)
       {
 	fputc(c,stderr);
-	if (c==errc) { fprintf(stderr,"\nError - %c\n",errc); exit(2); }
+	if (c==errc) { fprintf(stderr,"\nError - %c(%c/%x)\n",errc,c,c); exit(2); }
       }
     fputc(rchar,stderr); 
     c=0;
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
       f=fopen(argv[optind],"r");
     }
   if (!f) { fprintf(stderr, "No file\n"); exit(1); }
-  putchar('\r'); putchar('\n');
+  putchar('\r'); // putchar('\n');
   elfwait('\0');
   time(&t0);
   while (!feof(f))
@@ -96,10 +96,10 @@ int main(int argc, char *argv[])
       // newline == CRLF
       if (c=='\n') c='\r';
       if (c!=EOF) { putchar(c); fputc(c,stderr); }  
-      if (c=='\r') { putchar('\n'); fputc('\n',stderr); }
+      //      if (c=='\r') { putchar('\n'); fputc('\n',stderr); }
 // read echo
       c1=getchar(); 
-      if (c1!=c) { fprintf(stderr,"\nError (%c,%c)\n",c1,c); exit(2); }
+      if (c1!=c) { fprintf(stderr,"\nError (%c/%x,%c/%x)\n",c1,c1,c,c); exit(2); }
       if (c=='\r') 
 	{
 	  elfwait(echar);
