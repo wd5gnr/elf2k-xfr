@@ -32,25 +32,40 @@ char rchar='>';
 unsigned int nct=2;
 char echar='?';
 
+// For some reason, some USB serial ports return 0 here
+// so we ignore them. We also ignore any negative error
+int getnzchar(void)
+{
+  int c;
+  do
+    {
+      c=getchar();
+    } while (c<=0);
+  return c;
+}
+
 // wait for prompt -- errc is an error character
 void elfwait(int errc)
   {
     int c;
     // wait for response
-    while ((c=getchar())!=rchar)
+    while (((c=getnzchar())>=0) && c!=rchar)
       {
+	if (c==0) continue;
 	fputc(c,stderr);
-	if (c==errc) { fprintf(stderr,"\nError - %c(%c/%x)\n",errc,c,c); exit(2); }
+	if (c==errc) { fprintf(stderr,"\n 2 Error - %x(%x)\n",errc,c); exit(2); }
       }
     fputc(rchar,stderr); 
     c=0;
     while (c!=nct)
       {
-	fputc(getchar(),stderr); // eat rest of prompt
+	fputc(getnzchar(),stderr); // eat rest of prompt
 	c++;
       }
     usleep(ldelay);
   }
+
+
 
 
 int main(int argc, char *argv[])
@@ -79,7 +94,7 @@ int main(int argc, char *argv[])
 	  exit(2);
 	}
     }
-  fprintf(stderr,"elf2k-xfr by Al Williams... Uploading ");
+  fprintf(stderr,"elf2k-xfr v3 by Al Williams... Uploading ");
   if (optind<argc)
     {
       fprintf(stderr,"%s\n",argv[optind]);
@@ -91,15 +106,21 @@ int main(int argc, char *argv[])
   time(&t0);
   while (!feof(f))
     {
-      int c=getc(f),c1;
+      int c=getc(f),c1,redo;
       if (c==EOF) break;
       // newline == CRLF
       if (c=='\n') c='\r';
       if (c!=EOF) { putchar(c); fputc(c,stderr); }  
-      //      if (c=='\r') { putchar('\n'); fputc('\n',stderr); }
 // read echo
-      c1=getchar(); 
-      if (c1!=c) { fprintf(stderr,"\nError (%c/%x,%c/%x)\n",c1,c1,c,c); exit(2); }
+      do {
+        c1=getnzchar(); 
+      // ignore extra crlfs
+	redo=0;
+	if (c1=='\r' && c!='\r') redo=1;
+	if (c1=='\n' && c!='\n') redo=1;
+	if (redo) fputc(c1,stderr);
+      } while (redo);
+      if (c1!=c) { fprintf(stderr,"\n1 Error (%x,%x)\n",c1,c); exit(1); }
       if (c=='\r') 
 	{
 	  elfwait(echar);
